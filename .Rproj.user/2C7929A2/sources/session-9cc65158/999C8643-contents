@@ -1,0 +1,23 @@
+import sys
+import os 
+import shutil 
+
+sys.path.append('.')
+from  datagid24.sampling_complexity_testall import parallelSamplingGID
+
+
+def gid24data(comdist=20,tpath=None):
+    if tpath is None: 
+      tpath ='/geosampling/complexRSPatches/gid24_'+str(comdist)  #'/geocomplex/complexRSample/ty_sample2/dset1_cdist'+str(comdist)  
+    if os.path.exists(tpath):
+       shutil.rmtree(tpath)
+    os.makedirs(tpath) 
+    sampling = parallelSamplingGID(patchsize=256,complexbdist=comdist,ncore=50)
+    sampling.samallpatchBFl(tpath)
+ 
+def main():
+    comdist=10 
+    gid24data(comdist)
+
+if __name__=='__main__':
+    main()

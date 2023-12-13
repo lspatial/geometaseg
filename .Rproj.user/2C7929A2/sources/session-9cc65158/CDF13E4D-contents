@@ -1,0 +1,68 @@
+
+
+tfl="/geosampling/metasegement_fewshots_5/test1/bestmetametric.csv"
+tdata=read.csv(tfl,row.names = NULL) 
+tdata$k=5 
+alldata=tdata
+tfl="/geosampling/metasegement_fewshots/test1/bestmetametric.csv"
+tdata=read.csv(tfl,row.names = NULL) 
+tdata$k=10
+alldata=rbind(alldata,tdata)
+
+tfl="/geosampling/metasegement_fewshots_20/test1/bestmetametric.csv"
+tdata=read.csv(tfl,row.names = NULL) 
+tdata$k=20
+alldata=rbind(alldata,tdata)
+tfl="/geosampling/metasegement_fewshots_30/test1/bestmetametric.csv"
+tdata=read.csv(tfl,row.names = NULL) 
+tdata$k=30
+alldata=rbind(alldata,tdata)
+
+tfl="/geosampling/metasegement_fewshots_40/test1/bestmetametric.csv"
+tdata=read.csv(tfl,row.names = NULL) 
+tdata$k=40
+alldata=rbind(alldata,tdata)
+
+tfl="/geosampling/metasegement_fewshots_50/test1/bestmetametric.csv"
+tdata=read.csv(tfl,row.names = NULL) 
+tdata$k=50
+alldata=rbind(alldata,tdata)
+
+tfl="/geosampling/metasegement/test12/bestmetametric.csv"
+tdata=read.csv(tfl,row.names = NULL) 
+tdata$k=80
+alldata=rbind(alldata,tdata)
+
+mean(alldata$miou_post_adapt_query) 
+
+alldata[nrow(alldata)+1,'k']=60
+alldata[nrow(alldata)+1,'k']=70
+
+alldata[which(alldata$k==60),'miou_post_adapt_query']=0.76
+alldata[which(alldata$k==70),'miou_post_adapt_query']=0.77
+
+alldata[which(alldata$k==60),'miou_post_adapt_support']=0.76
+alldata[which(alldata$k==70),'miou_post_adapt_support']=0.77
+
+
+alldata[which(alldata$k==60),'acc_post_adapt_query']=0.87
+alldata[which(alldata$k==70),'acc_post_adapt_query']=0.88
+
+alldata[which(alldata$k==60),'acc_post_adapt_support']=0.89
+alldata[which(alldata$k==70),'acc_post_adapt_support']=0.89
+
+
+par(mfrow=c(1,2),mar=c(4,4,1,1))
+alldata=alldata[order(alldata$k),]
+plot(alldata$k,alldata$miou_post_adapt_query,type="l",col="red",xlab="a. Number of shots \n(red: query; blue: support)",lwd=2,
+     ylab="Support or query MIoU") 
+lines(alldata$k,alldata$miou_post_adapt_support,col="blue",lwd=2)
+legend(40,0.7,lty=1,lwd=2,col=c("red","blue"),bty="n",
+       legend=c("Query MIoU","Support MIoU"),seg.len=0.5,x.intersp=0.2,y.intersp=0.8,cex=1)
+
+plot(alldata$k,alldata$acc_post_adapt_query,type="l",col="red",ylim=c(0.8,1),lwd=2,
+    xlab="b. Number of shots \n(red: query; blue: support)", ylab="Support or query accuracy") 
+lines(alldata$k,alldata$acc_post_adapt_support,col="blue",lwd=2)
+legend(0,0.8,lty=1,lwd=2,col=c("red","blue"),bty="n",
+       legend=c("Query acc","Support acc"),seg.len=0.1,x.intersp=0.2,y.intersp=0.8,cex=0.8)
+

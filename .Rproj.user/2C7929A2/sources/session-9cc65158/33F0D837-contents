@@ -1,0 +1,24 @@
+import torch, gc
+def fun(xx):
+    print(torch.cuda.memory_allocated() / 1024**2)
+    # Delete local reference
+    del xx
+    torch.cuda.empty_cache()
+    print(torch.cuda.memory_allocated() / 1024**2)
+    print(torch.cuda.memory_cached() / 1024 ** 2)
+    return
+
+print(torch.cuda.memory_allocated())
+print(torch.cuda.memory_cached())
+
+x = torch.randn(1024 * 1024, device='cuda')
+print(torch.cuda.memory_allocated() / 1024**2)
+print(torch.cuda.memory_cached() / 1024**2)
+
+fun(x)
+del x
+torch.cuda.empty_cache()
+x = None
+gc.collect()
+print(torch.cuda.memory_allocated() / 1024 ** 2)
+print(torch.cuda.memory_cached() / 1024**2)

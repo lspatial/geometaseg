@@ -1,0 +1,42 @@
+#!/bin/bash 
+
+for cls in 2
+do
+ source="/geosampling/rs_gidcls5/cdist10_r256sc1_mcomplex/"$cls
+ nduty=$(find $source -name "*.npz" -type f |wc -l)
+ echo 'starting: cls:'$cls" has "$nduty" files!"
+ ncpu=30
+ eachcduty=200
+ eachduty=$(( ncpu * eachcduty ))
+ ntime=$(( nduty%eachduty? nduty/eachduty+1:nduty/eachduty ))
+ for i in `seq 1 $ntime`; do
+   echo '###################### cls:'$cls', itime:'$i
+   istart=$((eachduty*(i-1)+1 ))
+   iend=$((eachduty*i ))
+   if [ $i -eq $ntime ]; then
+     iend=$(( nduty ))
+   fi
+   echo  "  i=="$i": start:"$istart";end: " $iend
+   pids=""
+   RESULT=0
+   iduty=$(( iend - istart + 1))
+   cpuduty=$(( iduty%ncpu? iduty/ncpu +1 :iduty/ncpu ))
+   echo "cpuduty="$cpuduty
+  
+   for j in `seq 1 $ncpu`; do
+     iistart=$(( istart + (j-1)*cpuduty ))
+     iiend=$(( istart + j*cpuduty -1 ))
+     if [ $j -eq $ncpu ]; then
+       iiend=$(( iend ))
+     fi
+     igpu=$(( j-1 ))
+     echo  "              cpu:"$icpu", iistart:"$iistart", iiend:"$iiend" ... ... ..."
+     python3.8  /aiprof/gcommeta_1/complexy_datagid24_mscale_term3_sum.py  $cls  $iistart  $iiend  &
+     pids="$pids $!"
+   done
+   for pid in $pids; do
+     wait $pid || let "RESULT=1"
+   done
+ done
+done
+

@@ -1,0 +1,138 @@
+
+
+tcls=1   
+rpath=paste("/geosampling/complexRSPatches/gid5_10_mcomplex_sum/",tcls,sep="")
+fls=list.files(rpath) 
+fls=fls[grep("^f.*\\.csv",fls)]
+
+for(i in c(1:length(fls))){ # i=1 
+  print(i)
+  fullfl=paste(rpath,"/",fls[i],sep="") 
+  adata=read.csv(fullfl,row.names=NULL) 
+  if(i==1){
+    alldata=adata
+  }else{
+    alldata=rbind(alldata,adata)
+  }
+}
+
+plot(alldata$p5_mean,alldata$m5_mean)
+ 
+covs=c("e21_mean","e15_mean","e11_mean","e7_mean","e5_mean")
+alldata$e_all=rowMeans(alldata[,covs],na.rm=TRUE)  
+
+covs=c("m21_mean","m15_mean","m11_mean","m7_mean","m5_mean")
+alldata$m_all=rowMeans(alldata[,covs],na.rm=TRUE)  
+
+covs=c("p21_mean","p15_mean","p11_mean","p7_mean","p5_mean")
+alldata$p_all=rowMeans(alldata[,covs],na.rm=TRUE)  
+
+
+hist(alldata$p_all,breaks=300) 
+
+write.csv(alldata,paste("/geosampling/complexRSPatches/gid24_10_mcomplex_sum/patchall_cls",tcls,"_sum.csv",sep=""),row.names = FALSE)
+
+################################################
+
+nrow(alldata[which(alldata$p_all>0.99),])
+
+
+p=0.2 
+samindex=sample(c(1:nrow(alldata)), as.integer(nrow(alldata)*p), replace = FALSE) 
+hist(alldata[samindex,'p_all'],breaks = 100)
+
+
+sampleWei=function(indata,pro,tarfld){
+  tnum_sample=as.integer(nrow(indata)*pro)
+  windex=which(alldata[,tarfld]>0)
+  numprop=length(windex)
+  if(numprop<tnum_sample){
+    invwindex=which(alldata[,tarfld]<=0)
+    numdif=tnum_sample-numprop
+    samindex=sample(invwindex, numdif, replace = FALSE) 
+    tvalidindex=c(windex,samindex)
+    return(tvalidindex)
+  }
+  tvalidindex=sample(c(1:nrow(indata)), numprop,prob = indata[,tarfld], replace = FALSE) 
+  return(tvalidindex)
+}
+
+
+tarfld='e_all' 
+samindex_ew=sampleWei(alldata,p,tarfld)
+hist(alldata[samindex_ew,tarfld],breaks=100 )
+
+
+samindex_ew=samindex2wei=sample(c(1:nrow(alldata)), as.integer(nrow(alldata)*p),prob = alldata$e_all, replace = FALSE) 
+hist(alldata[samindex_ew,'p_all']) 
+
+library(dplyr)
+
+
+q=c(0,0.85,0.9,0.95,0.98，0.99,1.0) 
+#q=c(0,0.2, 0.5,  0.7,0.9,1.0) 
+qvals=quantile(alldata$e_all,probs=q)
+alldata$stratum=0 
+for(i in c(1:length(qvals))){
+  print(paste(i,",",qvals[i]))
+}
+
+for(i in c(2:length(qvals))){
+  qmin=qvals[i-1]
+  qmax=qvals[i]
+  alldata[which(alldata$e_all>=qmin & alldata$e_all<qmax),'stratum']=i-1  
+}
+
+alldata[which(alldata$e_all>1),'stratum']=10   
+
+alldata_optsam=alldata %>% group_by(stratum) %>% slice_sample(prop=0.5,weight_by =m_all)
+
+hist(alldata_optsam$p_all,breaks=100) 
+
+###
+boxplot(alldata$e_all)
+
+splits=c(0,0.1,0.3,0.6,0.8)
+
+
+
+
+
+
+alpha=c(20,20,20,20,20,10,18)
+beta =c(5,8,12,16,20,12,1) 
+beta_series=retrieveMBetaCurves(xlim=c(0,1),xint=300,alpha=alpha,beta=beta)
+ggplot() + 
+  geom_line(aes(x=beta_series$x,y=beta_series$value,col=beta_series$variable))+
+  geom_histogram(aes(x=alldata$p_all,y=..density..), colour="black", fill="gray",bins =200)+
+  geom_density(aes(x=alldata$p_all),alpha=.1, fill="#FF6666")    +
+  geom_histogram(aes(x=alldata_optsam$p_all,y=..density..), colour="blue", fill="gray",bins =200)+
+  geom_density(aes(x=alldata_optsam$p_all),alpha=.5, fill="lightblue")+   
+  ylab("Density (PDF)")+
+  xlab("Proportion of target valid pixels")+
+  scale_y_continuous(sec.axis = sec_axis(~./8, name = ""),limits=c(0,5.6)) 
+
+
+
+
+
+####################################################################3
+
+hist(alldata$e_all,breaks=100) 
+hist(alldata$m_all,breaks=100) 
+
+nsample=as.integer(nrow(alldata)*0.6) 
+samp_idx = sample(seq_len(nrow(alldata)), nsample, prob=alldata$e_all)
+samp_idx0 = sample(seq_len(nrow(alldata)), nsample)
+
+par(mfrow=c(1,2),par=c(4,4,1,1))
+hist(alldata[samp_idx,"e_all"],breaks=50) 
+hist(alldata[samp_idx0,"e_all"],breaks=50) 
+
+
+hist(alldata$m7_mean,breaks=100) 
+
+hist(alldata$e7_mean,breaks=100) 
+
+
+hist(alldata$k41_max,breaks=100) 

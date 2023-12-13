@@ -1,0 +1,59 @@
+
+tfl="/geosampling/rs_gidcls5/cdist10_r256sc1_mcomplex_sum/patchall_cls2_sum.csv" 
+tdata=read.csv(tfl,row.names = NULL) 
+hist(tdata$m_all) 
+#"m21_mean" "e21_mean" "p21_mean" "m15_mean" "e15_mean" "p15_mean" "m11_mean"
+# "e11_mean" "p11_mean" "m7_mean"  "e7_mean"  "p7_mean"  "m5_mean"  "e5_mean"  "p5_mean"  "e_all"   
+# "m_all"    "p_all"
+prop=0.1 
+nsample=floor(nrow(tdata)*prop) 
+wei='m_all'
+samp_idx = sample(seq_len(nrow(tdata)), nsample, prob=tdata[,wei])
+sel_data = tdata[samp_idx,]
+
+wei='e_all'
+samp_idx = sample(seq_len(nrow(tdata)), nsample, prob=tdata[,wei])
+sel_data_e = tdata[samp_idx,]
+
+samp_idx = sample(seq_len(nrow(tdata)), nsample)
+sel_data_random = tdata[samp_idx,]
+
+par(mfrow=c(3,1),mar=c(4,4,1,1))
+tar="m_all"
+hist(tdata[,tar],breaks = 100)
+hist(sel_data[,tar],breaks = 100)
+hist(sel_data_random[,tar],breaks = 100)
+
+##############
+library(dplyr)
+q=c(0,0.2,0.4,0.6,0.8,0.9,1.0) 
+#q=c(0,0.2, 0.5,  0.7,0.9,1.0) 
+#q=c(0,0.3,0.6,1.0) 
+qvals=quantile(tdata$e_all,probs=q)
+tdata$stratum=0 
+for(i in c(1:length(qvals))){
+  print(paste(i,",",qvals[i]))
+}
+
+for(i in c(2:length(qvals))){
+  qmin=qvals[i-1]
+  qmax=qvals[i]
+  tdata[which(tdata$e_all>=qmin & tdata$e_all<qmax),'stratum']=i-1  
+}
+tdata[which(tdata$e_all>1),'stratum']=10   
+
+tdata_optsam=tdata %>% group_by(stratum) %>% slice_sample(prop=prop,weight_by =m_all)
+tdata_optsam=data.frame(tdata_optsam)
+
+par(mfrow=c(5,1),mar=c(4,4,1,1))
+tar="e_all"
+tar="p11_mean"
+hist(tdata[,tar],breaks = 100)
+hist(sel_data[,tar],breaks = 100)
+hist(sel_data_e[,tar],breaks = 100)
+hist(sel_data_random[,tar],breaks = 100)
+hist(tdata_optsam[,tar],breaks = 100)
+
+
+
+
