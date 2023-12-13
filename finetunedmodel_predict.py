@@ -81,12 +81,12 @@ def main():
     clsmap={'background':0,'water':1,'buildup':2,'farmland':3,'forest':4,'meadow':5}
     cls=clsmap['buildup']
     srcpath='/geosampling/rs_gidcls5/cdist10_r256sc1_mcomplex/'+str(cls)
-    targetpath ='/geosampling/predict3'
+    targetpath ='/geosampling/predict4'
     if  not os.path.exists(targetpath): 
         os.makedirs(targetpath)
     samtest.setPath(srcpath,targetpath)
     samconfig={'sampleSFile':'/geosampling/rs_gidcls5/cdist10_r256sc1_mcomplex_sum/patchall_cls2_sum.csv',\
-               'uid':'uid','trainprp':0.006,'testprp':0.006,'testsamplestype':'random',\
+               'uid':'uid','trainprp':0.0001,'testprp':0.0001,'testsamplestype':'random',\
                'stratify':None,'strange':None,'weight':'p_all'}
     batch_size=36                
     samtest.runpredict(samconfig,device,batch_size)

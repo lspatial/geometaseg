@@ -3,7 +3,7 @@
 
 """
 Usage:
-    memaseg_mup.py --learn-inner-lrs --gpu 0 --batch-size 4 --num-group 1 --num-support 20  --num-query 20  --num-inner-steps 1   --init-inner-lr 0.4 --outer-lr 0.03 --num-train-iterations 2 --iloop-batch 10  --oloop-batch 10  --log-dir /geosampling/metasegement/test1  [options]
+    memaseg.py --learn-inner-lrs --gpu 0 --batch-size 4 --num-group 1 --num-support 10  --num-query 20  --num-inner-steps 1   --init-inner-lr 0.4 --outer-lr 0.03 --num-train-iterations 2 --iloop-batch 10  --oloop-batch 10  --log-dir /geosampling/metasegement/test1  [options]
 
 Options:
     -h --help                               show this screen.

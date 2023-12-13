@@ -6,7 +6,10 @@ Lianfa Li
 <img src='./figs/geomamlframe.png' width=60%>
 
 This code library is shared for the project paper titled *Meta-Learning
-for Improved Semantic Segmentation of Build-Ups in Remote Sensing*.
+for Improved Semantic Segmentation of Build-Ups in Remote Sensing*. Data
+samples for this project can be generated through the sampling program,
+which utilizes the source GID dataset available for download at
+<https://captain-whu.github.io/GID>.
 
 The model process includes four steps:
 
@@ -143,7 +146,7 @@ essential for its execution. These parameters include:
 A typical implementation resembles the following:
 
 ``` python
-python memaseg.py --learn-inner --num-group 1 --num-support 5 --num-inner 5 --num-inner-steps 5 --init-inner-lr 0.2 --outer-lr 0.04 --num-train-iterations 200 --log-dir /tmp 
+python memaseg.py --learn-inner-lrs --gpu 0 --batch-size 4 --num-group 1 --num-support 5  --num-query 5  --num-inner-steps 1   --init-inner-lr 0.4 --outer-lr 0.03 --num-train-iterations 2 --iloop-batch 10  --oloop-batch 10  --log-dir /tmp/test1 
 ```
 
 ## 5. Transfer Learning
@@ -178,7 +181,7 @@ A typical implementation, using the pretrained meta UNet, looks like
 this:
 
 ``` python
-python samplegid5.py --gpu 0 --model-type meta_train --train-prp 0.1 --pretrain-mode all --n-epoch 2 --log-dir /geosampling/meta_train
+python finetune_transfer_gid5.py --gpu 0 --model-type meta_train --train-prp 0.1 --pretrain-mode all --n-epoch 2 --log-dir /geosampling/meta_train
 ```
 
 ## 6. Statistical analysis
