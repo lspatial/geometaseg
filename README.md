@@ -1,11 +1,12 @@
 GeoMetaSegment
 ================
 Lianfa Li
-2023-12-14
+2023-12-12
 
-<img src='./figs/geomamlframe.png' width=60%> This code library is
-shared for the project paper titled *Meta-Learning for Improved Semantic
-Segmentation of Build-Ups in Remote Sensing*.
+<img src='./figs/geomamlframe.png' width=60%>
+
+This code library is shared for the project paper titled *Meta-Learning
+for Improved Semantic Segmentation of Build-Ups in Remote Sensing*.
 
 The model process includes four steps:
 
